@@ -6,6 +6,7 @@ mylist.names <- c("suicide", "age", "male", "disability", "depression",
                    "antidepressants", "benzos", "moodstabilizer", "antipsych", 
                    "sleepingpill", "BMI", "SBP", "DBP", "hgb", "AST", "TG", 
                    "HDL", "LDL", "creatinine")
+
 mylist <- vector("list", length(mylist.names))
 names(mylist) <- mylist.names
 
