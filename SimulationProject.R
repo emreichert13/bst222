@@ -2,26 +2,22 @@
 library(faux)
 library(bindata)
 
-mylist.names <- c("suicide", "age", "male", "disability", "depression", 
-                   "antidepressants", "benzos", "moodstabilizer", "antipsych", 
-                   "sleepingpill", "BMI", "SBP", "DBP", "hgb", "AST", "TG", 
-                   "HDL", "LDL", "creatinine")
-
-mylist <- vector("list", length(mylist.names))
-names(mylist) <- mylist.names
-
 ## Construct a binary correlation matrix
+# this is used later for establishing corr between depression, anti-depressant
+# use, and benzo use in simulated dataset
 rho <- 0.20
 m <- matrix(c(1,rho, rho,rho,1, rho,rho,rho,1), ncol=3)
 
 res <- data.frame(matrix(ncol = 19, nrow = 0))
 
 # Run through simulation results
-for (i in 1:10000) {
-  for (p in c(0.0001, 0.001, .01, .05)) {
+for (i in 1:10000) { #10,000 observations 
+  for (p in c(0.0001, 0.001, .01, .05)) { #explore 4 different suicide prevalence
+    #0.01%, 0.1% (closest to observed in study), 1%, 5%
     x <- runif(n = 1, min = 0, max = 1)
     if (x < p) { #suicide
       suicide <- 1
+      #draw from distributions for those who die by suicide
       age <- rnorm(1, mean = 74.1, sd = 5.27)
       male <- rbern(1, 0.72)
       disability <- rbern(1, 0.07)
@@ -55,6 +51,7 @@ for (i in 1:10000) {
     }
     else { #non-suicide
       suicide <- 0
+      #draw from distributions for those who don't die by suicide
       age <- rnorm(1, mean = 72.1, sd = 4.41)
       male <- rbern(1, 0.5053)
       disability <- rbern(1, 0.0214)
