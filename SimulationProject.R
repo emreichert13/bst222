@@ -1,6 +1,7 @@
 
 library(faux)
 library(bindata)
+library(Rlab)
 
 ## Construct a binary correlation matrix
 # this is used later for establishing corr between depression, anti-depressant
@@ -12,7 +13,7 @@ res <- data.frame(matrix(ncol = 19, nrow = 0))
 
 # Run through simulation results
 for (i in 1:10000) { #10,000 observations 
-  for (p in c(0.0001, 0.001, .01, .05)) { #explore 4 different suicide prevalence
+  for (p in c(0.001, 0.002, 0.01, 0.05)) { #explore 4 different suicide prevalence
     #0.01%, 0.1% (closest to observed in study), 1%, 5%
     x <- runif(n = 1, min = 0, max = 1)
     if (x < p) { #suicide
