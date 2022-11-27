@@ -273,16 +273,3 @@ legend(0.7, 0.4, legend = c("Random Forest", "Logistic", "Log-binomial", "Poisso
        col = c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"), cex = 0.8, lwd = c(2,2,2,2,2))
 abline(a = 0, b = 1, lty = 2) 
 ```
-
-
-
-
-
-predicted_logistic <- predict(logistic_mod, data = SimRes, type="response")
-
-auc(SimRes$suicide, predicted_logistic)
-
-pred = prediction(predicted_logistic, SimRes$suicide)
-roc = performance(pred,"tpr","fpr")
-plot(roc, colorize = F, lwd = 2)
-```
