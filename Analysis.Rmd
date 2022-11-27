@@ -1,0 +1,288 @@
+---
+title: "BST 222 Project"
+author: "Omar Mansour"
+date: "2022-11-23"
+output: html_document
+---
+
+# Load libraries
+```{r}
+library(dplyr)
+library(ggplot2)
+library(randomForest)
+library(MASS)
+library(ROCR)
+library(pROC)
+
+set.seed(333)
+```
+
+# Data
+```{r}
+SimRes <- read.csv("~/Desktop/Project/res.csv")
+SimRes$suicide <- ifelse(SimRes$suicide == 1, T, F)
+
+SimRes_01 <- subset(SimRes, p_suicide == 0.001)
+SimRes_02 <- subset(SimRes, p_suicide == 0.002)
+SimRes_1 <- subset(SimRes, p_suicide == 0.01)
+SimRes_5 <- subset(SimRes, p_suicide == 0.05)
+```
+
+# Random forest models
+```{r}
+rf_mod_01 <- randomForest(suicide ~ . - p_suicide, data = SimRes_01)
+rf_mod_02 <- randomForest(suicide ~ . - p_suicide, data = SimRes_02)
+rf_mod_1 <- randomForest(suicide ~ . - p_suicide, data = SimRes_1)
+rf_mod_5 <- randomForest(suicide ~ . - p_suicide, data = SimRes_5)
+```
+# Logistic regression models
+```{r}
+logistic_mod_01 <- glm(suicide ~ . - p_suicide, data = SimRes_01, family = binomial(link = "logit"))
+summary(logistic_mod_01)[5]
+
+logistic_mod_02 <- glm(suicide ~ . - p_suicide, data = SimRes_02, family = binomial(link = "logit"))
+summary(logistic_mod_02)[5]
+
+logistic_mod_1 <- glm(suicide ~ . - p_suicide, data = SimRes_1, family = binomial(link = "logit"))
+summary(logistic_mod_1)[5]
+
+logistic_mod_5 <- glm(suicide ~ . - p_suicide, data = SimRes_5, family = binomial(link = "logit"))
+summary(logistic_mod_5)[5]
+```
+# Log-binomial regression models
+```{r}
+logbin_mod_01 <- glm(suicide ~ . - p_suicide, data = SimRes_01, family = binomial(link = "log"))
+summary(logbin_mod_01)[5]
+
+logbin_mod_02 <- glm(suicide ~ . - p_suicide, data = SimRes_02, family = binomial(link = "log"))
+summary(logbin_mod_02)[5]
+
+logbin_mod_1 <- glm(suicide ~ . - p_suicide, data = SimRes_1, family = binomial(link = "log"))
+summary(logbin_mod_1)[5]
+
+logbin_mod_5 <- glm(suicide ~ . - p_suicide, data = SimRes_5, family = binomial(link = "log"))
+summary(logbin_mod_5)[5]
+```
+# Poisson regression models
+```{r}
+poisson_mod_01 <- glm(suicide ~ . - p_suicide, data = SimRes_01, family = poisson(link = "log"))
+summary(poisson_mod_01)[5]
+
+poisson_mod_02 <- glm(suicide ~ . - p_suicide, data = SimRes_02, family = poisson(link = "log"))
+summary(poisson_mod_02)[5]
+
+poisson_mod_1 <- glm(suicide ~ . - p_suicide, data = SimRes_1, family = poisson(link = "log"))
+summary(poisson_mod_1)[5]
+
+poisson_mod_5 <- glm(suicide ~ . - p_suicide, data = SimRes_5, family = poisson(link = "log"))
+summary(poisson_mod_5)[5]
+```
+
+# Negative-binomial regression models
+```{r}
+nb_mod_01 <- glm.nb(suicide ~ . - p_suicide, data = SimRes_01)
+summary(nb_mod_01)[5]
+
+nb_mod_02 <- glm.nb(suicide ~ . - p_suicide, data = SimRes_02)
+summary(nb_mod_02)[5]
+
+nb_mod_1 <- glm.nb(suicide ~ . - p_suicide, data = SimRes_1)
+summary(nb_mod_1)[5]
+
+nb_mod_5 <- glm.nb(suicide ~ . - p_suicide, data = SimRes_5)
+summary(nb_mod_5)[5]
+```
+
+# AUC
+```{r}
+#RF
+rf_predicted_01 <- predict(rf_mod_01, data = SimRes_01, type="response")
+auc(SimRes_01$suicide, rf_predicted_01)
+
+rf_predicted_02 <- predict(rf_mod_01, data = SimRes_02, type="response")
+auc(SimRes_02$suicide, rf_predicted_02)
+
+rf_predicted_1 <- predict(rf_mod_01, data = SimRes_1, type="response")
+auc(SimRes_1$suicide, rf_predicted_1)
+
+rf_predicted_5 <- predict(rf_mod_01, data = SimRes_5, type="response")
+auc(SimRes_5$suicide, rf_predicted_5)
+
+#Logistic
+logistic_predicted_01 <- predict(logistic_mod_01, data = SimRes_01, type="response")
+auc(SimRes_01$suicide, logistic_predicted_01)
+
+logistic_predicted_02 <- predict(logistic_mod_01, data = SimRes_02, type="response")
+auc(SimRes_02$suicide, logistic_predicted_02)
+
+logistic_predicted_1 <- predict(logistic_mod_01, data = SimRes_1, type="response")
+auc(SimRes_1$suicide, logistic_predicted_1)
+
+logistic_predicted_5 <- predict(logistic_mod_01, data = SimRes_5, type="response")
+auc(SimRes_5$suicide, logistic_predicted_5)
+
+#Log-binomial
+logbin_predicted_01 <- predict(logbin_mod_01, data = SimRes_01, type="response")
+auc(SimRes_01$suicide, logbin_predicted_01)
+
+logbin_predicted_02 <- predict(logbin_mod_01, data = SimRes_02, type="response")
+auc(SimRes_02$suicide, logbin_predicted_02)
+
+logbin_predicted_1 <- predict(logbin_mod_01, data = SimRes_1, type="response")
+auc(SimRes_1$suicide, logbin_predicted_1)
+
+logbin_predicted_5 <- predict(logbin_mod_01, data = SimRes_5, type="response")
+auc(SimRes_5$suicide, logbin_predicted_5)
+
+#Poisson
+poisson_predicted_01 <- predict(poisson_mod_01, data = SimRes_01, type="response")
+auc(SimRes_01$suicide, poisson_predicted_01)
+
+poisson_predicted_02 <- predict(poisson_mod_01, data = SimRes_02, type="response")
+auc(SimRes_02$suicide, poisson_predicted_02)
+
+poisson_predicted_1 <- predict(poisson_mod_01, data = SimRes_1, type="response")
+auc(SimRes_1$suicide, poisson_predicted_1)
+
+poisson_predicted_5 <- predict(poisson_mod_01, data = SimRes_5, type="response")
+auc(SimRes_5$suicide, poisson_predicted_5)
+
+#Negative binomial
+nb_predicted_01 <- predict(nb_mod_01, data = SimRes_01, type="response")
+auc(SimRes_01$suicide, nb_predicted_01)
+
+nb_predicted_02 <- predict(nb_mod_01, data = SimRes_02, type="response")
+auc(SimRes_02$suicide, nb_predicted_02)
+
+nb_predicted_1 <- predict(nb_mod_01, data = SimRes_1, type="response")
+auc(SimRes_1$suicide, nb_predicted_1)
+
+nb_predicted_5 <- predict(nb_mod_01, data = SimRes_5, type="response")
+auc(SimRes_5$suicide, nb_predicted_5)
+```
+
+# ROC plots 0.01%
+```{r}
+rf_pred_01 <- prediction(rf_predicted_01, SimRes_01$suicide)
+rf_roc_01 <- performance(rf_pred_01,"tpr","fpr")
+
+logistic_pred_01 <- prediction(logistic_predicted_01, SimRes_01$suicide)
+logistic_roc_01 <- performance(logistic_pred_01,"tpr","fpr")
+
+logbin_pred_01 <- prediction(logbin_predicted_01, SimRes_01$suicide)
+logbin_roc_01 <- performance(logbin_pred_01,"tpr","fpr")
+
+poisson_pred_01 <- prediction(poisson_predicted_01, SimRes_01$suicide)
+poisson_roc_01 <- performance(poisson_pred_01,"tpr","fpr")
+
+nb_pred_01 <- prediction(nb_predicted_01, SimRes_01$suicide)
+nb_roc_01 <- performance(nb_pred_01,"tpr","fpr")
+
+
+plot(rf_roc_01, colorize = F, lwd = 2, col = "#e41a1c", main = "Outcome Prevalence = 0.01%")
+plot(logistic_roc_01, add = TRUE, colorize = F, lwd = 2, col = "#377eb8")
+plot(logbin_roc_01, add = TRUE, colorize = F, lwd = 2, col = "#4daf4a")
+plot(poisson_roc_01, add = TRUE, colorize = F, lwd = 2, col = "#984ea3")
+plot(nb_roc_01, add = TRUE, colorize = F, lwd = 2, col = "#ff7f00")
+legend(0.7, 0.4, legend = c("Random Forest", "Logistic", "Log-binomial", "Poisson", "Negative binomial"),
+       col = c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"), cex = 0.8, lwd = c(2,2,2,2,2))
+abline(a = 0, b = 1, lty = 2) 
+```
+
+# ROC plots 0.02%
+```{r}
+rf_pred_02 <- prediction(rf_predicted_02, SimRes_02$suicide)
+rf_roc_02 <- performance(rf_pred_02,"tpr","fpr")
+
+logistic_pred_02 <- prediction(logistic_predicted_02, SimRes_02$suicide)
+logistic_roc_02 <- performance(logistic_pred_02,"tpr","fpr")
+
+logbin_pred_02 <- prediction(logbin_predicted_02, SimRes_02$suicide)
+logbin_roc_02 <- performance(logbin_pred_02,"tpr","fpr")
+
+poisson_pred_02 <- prediction(poisson_predicted_02, SimRes_02$suicide)
+poisson_roc_02 <- performance(poisson_pred_02,"tpr","fpr")
+
+nb_pred_02 <- prediction(nb_predicted_02, SimRes_02$suicide)
+nb_roc_02 <- performance(nb_pred_02,"tpr","fpr")
+
+
+plot(rf_roc_02, colorize = F, lwd = 2, col = "#e41a1c", main = "Outcome Prevalence = 0.02%")
+plot(logistic_roc_02, add = TRUE, colorize = F, lwd = 2, col = "#377eb8")
+plot(logbin_roc_02, add = TRUE, colorize = F, lwd = 2, col = "#4daf4a")
+plot(poisson_roc_02, add = TRUE, colorize = F, lwd = 2, col = "#984ea3")
+plot(nb_roc_02, add = TRUE, colorize = F, lwd = 2, col = "#ff7f00")
+legend(0.7, 0.4, legend = c("Random Forest", "Logistic", "Log-binomial", "Poisson", "Negative binomial"),
+       col = c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"), cex = 0.8, lwd = c(2,2,2,2,2))
+abline(a = 0, b = 1, lty = 2) 
+```
+
+# ROC plots 1%
+```{r}
+rf_pred_1 <- prediction(rf_predicted_1, SimRes_1$suicide)
+rf_roc_1 <- performance(rf_pred_1,"tpr","fpr")
+
+logistic_pred_1 <- prediction(logistic_predicted_1, SimRes_1$suicide)
+logistic_roc_1 <- performance(logistic_pred_1,"tpr","fpr")
+
+logbin_pred_1 <- prediction(logbin_predicted_1, SimRes_1$suicide)
+logbin_roc_1 <- performance(logbin_pred_1,"tpr","fpr")
+
+poisson_pred_1 <- prediction(poisson_predicted_1, SimRes_1$suicide)
+poisson_roc_1 <- performance(poisson_pred_1,"tpr","fpr")
+
+nb_pred_1 <- prediction(nb_predicted_1, SimRes_1$suicide)
+nb_roc_1 <- performance(nb_pred_1,"tpr","fpr")
+
+
+plot(rf_roc_1, colorize = F, lwd = 2, col = "#e41a1c", main = "Outcome Prevalence = 1%")
+plot(logistic_roc_1, add = TRUE, colorize = F, lwd = 2, col = "#377eb8")
+plot(logbin_roc_1, add = TRUE, colorize = F, lwd = 2, col = "#4daf4a")
+plot(poisson_roc_1, add = TRUE, colorize = F, lwd = 2, col = "#984ea3")
+plot(nb_roc_1, add = TRUE, colorize = F, lwd = 2, col = "#ff7f00")
+legend(0.7, 0.4, legend = c("Random Forest", "Logistic", "Log-binomial", "Poisson", "Negative binomial"),
+       col = c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"), cex = 0.8, lwd = c(2,2,2,2,2))
+abline(a = 0, b = 1, lty = 2) 
+```
+
+
+# ROC plots 5%
+```{r}
+rf_pred_5 <- prediction(rf_predicted_5, SimRes_5$suicide)
+rf_roc_5 <- performance(rf_pred_5,"tpr","fpr")
+
+logistic_pred_5 <- prediction(logistic_predicted_5, SimRes_5$suicide)
+logistic_roc_5 <- performance(logistic_pred_5,"tpr","fpr")
+
+logbin_pred_5 <- prediction(logbin_predicted_5, SimRes_5$suicide)
+logbin_roc_5 <- performance(logbin_pred_5,"tpr","fpr")
+
+poisson_pred_5 <- prediction(poisson_predicted_5, SimRes_5$suicide)
+poisson_roc_5 <- performance(poisson_pred_5,"tpr","fpr")
+
+nb_pred_5 <- prediction(nb_predicted_5, SimRes_5$suicide)
+nb_roc_5 <- performance(nb_pred_5,"tpr","fpr")
+
+
+plot(rf_roc_5, colorize = F, lwd = 2, col = "#e41a1c", main = "Outcome Prevalence = 5%")
+plot(logistic_roc_5, add = TRUE, colorize = F, lwd = 2, col = "#377eb8")
+plot(logbin_roc_5, add = TRUE, colorize = F, lwd = 2, col = "#4daf4a")
+plot(poisson_roc_5, add = TRUE, colorize = F, lwd = 2, col = "#984ea3")
+plot(nb_roc_5, add = TRUE, colorize = F, lwd = 2, col = "#ff7f00")
+legend(0.7, 0.4, legend = c("Random Forest", "Logistic", "Log-binomial", "Poisson", "Negative binomial"),
+       col = c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"), cex = 0.8, lwd = c(2,2,2,2,2))
+abline(a = 0, b = 1, lty = 2) 
+```
+
+
+
+
+
+predicted_logistic <- predict(logistic_mod, data = SimRes, type="response")
+
+auc(SimRes$suicide, predicted_logistic)
+
+pred = prediction(predicted_logistic, SimRes$suicide)
+roc = performance(pred,"tpr","fpr")
+plot(roc, colorize = F, lwd = 2)
+```
